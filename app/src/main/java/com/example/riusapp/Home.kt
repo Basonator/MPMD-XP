@@ -13,6 +13,7 @@ class Home : androidx.fragment.app.Fragment() {
     private lateinit var btnReports: Button
     private lateinit var btnRatings: Button
     private lateinit var btnNumOfPosts: Button
+    lateinit var app: MyApplication
 
     //TODO replace with data from database
     private val dataset: List<List<Any>> = listOf(
@@ -27,18 +28,23 @@ class Home : androidx.fragment.app.Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        customAdapter = UserAdapter(dataset)
+        if (app.isLoggedIn()) {
+            customAdapter = UserAdapter(dataset)
 
-        val recyclerView: RecyclerView? = view.findViewById(R.id.recycler_view)
-        recyclerView?.adapter = customAdapter
+            val recyclerView: RecyclerView? = view.findViewById(R.id.recycler_view)
+            recyclerView?.adapter = customAdapter
 
-        btnReports = view.findViewById(R.id.btnReports)
-        btnRatings = view.findViewById(R.id.btnRatings)
-        btnNumOfPosts = view.findViewById(R.id.btnNumOfPosts)
+            btnReports = view.findViewById(R.id.btnReports)
+            btnRatings = view.findViewById(R.id.btnRatings)
+            btnNumOfPosts = view.findViewById(R.id.btnNumOfPosts)
 
-        btnReports.setOnClickListener { filterRecyclerView("REPORTS") }
-        btnRatings.setOnClickListener { filterRecyclerView("RATING") }
-        btnNumOfPosts.setOnClickListener { filterRecyclerView("POSTS") }
+            btnReports.setOnClickListener { filterRecyclerView("REPORTS") }
+            btnRatings.setOnClickListener { filterRecyclerView("RATING") }
+            btnNumOfPosts.setOnClickListener { filterRecyclerView("POSTS") }
+        }
+        else {
+            Log.d("HomeFragment", "User is not logged in. Do something here.")
+        }
     }
 
     private fun filterRecyclerView(filter: String) {
@@ -75,6 +81,7 @@ class Home : androidx.fragment.app.Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        app = (activity?.application as MyApplication)
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
 }

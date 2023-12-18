@@ -27,6 +27,13 @@ class PostOverview : Fragment() {
         super.onCreate(savedInstanceState)
     }
 
+    //TODO replace with data from database
+    private val dataset: List<List<Any?>> = listOf(
+        listOf(1, "Cool workout"),
+        listOf(2, "How did you get such good form?"),
+        listOf(3, "You don't get to skip leg day!")
+    )
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -59,12 +66,16 @@ class PostOverview : Fragment() {
         locationTextView = view.findViewById(R.id.cityTextView)
         dateTextView = view.findViewById(R.id.dateTextView)
         val mediaController = MediaController(view.context)
+        mediaController.setAnchorView(linkVideoView)
+        mediaController.setMediaPlayer(linkVideoView)
         linkVideoView.setMediaController(mediaController)
+
 
 
         postTitleView.text = postTitle
         ratingsTextView.text = ratings.toString()
         linkVideoView.setVideoURI(Uri.parse(link))
+        linkVideoView.start()
         locationTextView.text = location
         dateTextView.text = date
         btnRemove = view.findViewById(R.id.btnRemove)
@@ -76,6 +87,11 @@ class PostOverview : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val customAdapter = CommentAdapter(dataset)
+
+        val recyclerView: androidx.recyclerview.widget.RecyclerView? = view.findViewById(R.id.commentRecyclerView)
+        recyclerView?.adapter = customAdapter
 
     }
 

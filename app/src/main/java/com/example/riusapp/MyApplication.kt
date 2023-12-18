@@ -6,6 +6,7 @@ import java.util.UUID
 
 class MyApplication : Application(){
     lateinit var thisInstallationsUUID: UUID
+    var loggedIn = false
 
     override fun onCreate() {
         super.onCreate()
@@ -24,5 +25,15 @@ class MyApplication : Application(){
     private fun uuidExists(): Boolean {
         val pref = applicationContext.getSharedPreferences("MyApplicationClass", 0)
         return pref.contains("UUID")
+    }
+
+    fun login(){
+        loggedIn = true
+    }
+    fun isLoggedIn(): Boolean{
+        return loggedIn
+    }
+    fun logout(){
+        loggedIn = false
     }
 }
