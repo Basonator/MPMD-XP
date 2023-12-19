@@ -9,19 +9,41 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.example.riusapp.backend.RetrofitInstance
+import com.example.riusapp.backend.models.Posts
+import kotlinx.coroutines.launch
 
 class UserView : Fragment() {
     private var username: String? = null
     private var reports: Int? = null
     private var ratings: Int? = null
     private var posts: Int? = null
+    private var id: String? = null
+    private var dataset: List<List<Any>> = emptyList()
 
-    //TODO replace with data from database
-    private val dataset: List<List<Any>> = listOf(
-        listOf("My Post", 1, "https://res.cloudinary.com/duxwkkiwn/video/upload/v1699904305/videos/eksfidv6rjq82chy48q5.mp4", "PRISTAN, MARIBOR", "6 OCTOBER"),
-        listOf("Your Post", 2, "https://res.cloudinary.com/duxwkkiwn/video/upload/v1699904305/videos/eksfidv6rjq82chy48q5.mp4", "TEKAČEVO, SLATNA", "7 OCTOBER"),
-        listOf("Our Post", 3, "https://res.cloudinary.com/duxwkkiwn/video/upload/v1699904305/videos/eksfidv6rjq82chy48q5.mp4", "ŠENTJUR, METROPOLA", "8 OCTOBER"),
-    )
+
+    private suspend fun getPostsByUser(userId: String?) {
+        try {
+            val response = RetrofitInstance.api.getPostsByUser(userId ?: "")
+            if (response.isSuccessful) {
+                val posts = response.body() ?: emptyList()
+                dataset = convertPostsToDataset(posts)
+            } else {
+                Log.e("UserView", "Error fetching posts: ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Log.e("UserView", "Exception: ${e.message}")
+        }
+    }
+
+    private fun convertPostsToDataset(posts: List<Posts>): List<List<Any>> {
+        return posts.map { post ->
+            listOf(post.name, post._id, post.link, post.location, post.date, post.rating)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,23 +52,56 @@ class UserView : Fragment() {
             reports = it.getInt("reports")
             ratings = it.getInt("ratings")
             posts = it.getInt("posts")
+            id = it.getString("id")
         }
 
-        Log.d("UserView", "username: $username, reports: $reports, ratings: $ratings, posts: $posts")
+        Log.d("UserView", "username: $username, reports: $reports, ratings: $ratings, posts: $posts, id: $id")
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val customAdapter = PostAdapter(dataset)
 
-        val recyclerView: androidx.recyclerview.widget.RecyclerView? = view.findViewById(R.id.recycler_view)
-        recyclerView?.adapter = customAdapter
+        lifecycleScope.launch {
+            getPostsByUser(id)
 
-        val btnVerify: Button = view.findViewById(R.id.btnVerify)
-        val btnBan: Button = view.findViewById(R.id.btnBan)
+            val customAdapter = PostAdapter(dataset)
 
-        btnVerify.setOnClickListener { showDialog("Verification Dialog\nUsername: $username\nAction: VERIFY") }
-        btnBan.setOnClickListener { showDialog("Ban Dialog\nUsername: $username\nAction: BAN") }
+            val recyclerView: androidx.recyclerview.widget.RecyclerView? = view.findViewById(R.id.recycler_view)
+            recyclerView?.adapter = customAdapter
+
+            val btnVerify: Button = view.findViewById(R.id.btnVerify)
+            val btnBan: Button = view.findViewById(R.id.btnBan)
+
+            btnVerify.setOnClickListener {
+                showDialog("Verification Dialog\nUsername: $username\nAction: VERIFY")
+
+                lifecycleScope.launch {
+                    try {
+                        val response = RetrofitInstance.api.verifyUser(id ?: "")
+                        if (!response.isSuccessful) {
+                            Log.e("UserView", "Error verifying user: ${response.message()}")
+                        }
+                    } catch (e: Exception) {
+                        Log.e("UserView", "Exception: ${e.message}")
+                    }
+                }
+            }
+
+            btnBan.setOnClickListener {
+                showDialog("Ban Dialog\nUsername: $username\nAction: BAN")
+
+                lifecycleScope.launch {
+                    try {
+                        val response = RetrofitInstance.api.banUser(id ?: "")
+                        if (!response.isSuccessful) {
+                            Log.e("UserView", "Error baning user: ${response.message()}")
+                        }
+                    } catch (e: Exception) {
+                        Log.e("UserView", "Exception: ${e.message}")
+                    }
+                }
+            }
+        }
     }
 
     private fun showDialog(message: String) {

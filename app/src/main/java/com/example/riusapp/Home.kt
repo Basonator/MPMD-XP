@@ -6,20 +6,40 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView
+import com.example.riusapp.backend.RetrofitInstance
+import com.example.riusapp.backend.models.Users
+import kotlinx.coroutines.launch
 
 class Home : androidx.fragment.app.Fragment() {
     private lateinit var customAdapter: UserAdapter
     private lateinit var btnReports: Button
     private lateinit var btnRatings: Button
     private lateinit var btnNumOfPosts: Button
+    private var dataset: List<List<Any>> = emptyList()
 
-    //TODO replace with data from database
-    private val dataset: List<List<Any>> = listOf(
-        listOf("Bor", 1, 2, 6),
-        listOf("Jan", 4, 5, 3),
-        listOf("Tim", 7, 3, 2),
-    )
+    private suspend fun getUsersFromDatabase() {
+        try {
+            val response = RetrofitInstance.api.getUsers()
+            if (response.isSuccessful) {
+                val users = response.body() ?: emptyList()
+                dataset = convertUsersToDataset(users)
+            } else {
+                Log.e("UserView", "Error fetching users: ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Log.e("UserView", "Exception: ${e.message}")
+        }
+    }
+
+    private fun convertUsersToDataset(users: List<Users>): List<List<Any>> {
+        return users.map { user ->
+            listOf(user.username, user.reports, user.rating, user.posts, user._id)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,18 +47,23 @@ class Home : androidx.fragment.app.Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        customAdapter = UserAdapter(dataset)
 
-        val recyclerView: RecyclerView? = view.findViewById(R.id.recycler_view)
-        recyclerView?.adapter = customAdapter
+        lifecycleScope.launch {
+            getUsersFromDatabase()
 
-        btnReports = view.findViewById(R.id.btnReports)
-        btnRatings = view.findViewById(R.id.btnRatings)
-        btnNumOfPosts = view.findViewById(R.id.btnNumOfPosts)
+            customAdapter = UserAdapter(dataset)
 
-        btnReports.setOnClickListener { filterRecyclerView("REPORTS") }
-        btnRatings.setOnClickListener { filterRecyclerView("RATING") }
-        btnNumOfPosts.setOnClickListener { filterRecyclerView("POSTS") }
+            val recyclerView: RecyclerView? = view.findViewById(R.id.recycler_view)
+            recyclerView?.adapter = customAdapter
+
+            btnReports = view.findViewById(R.id.btnReports)
+            btnRatings = view.findViewById(R.id.btnRatings)
+            btnNumOfPosts = view.findViewById(R.id.btnNumOfPosts)
+
+            btnReports.setOnClickListener { filterRecyclerView("REPORTS") }
+            btnRatings.setOnClickListener { filterRecyclerView("RATING") }
+            btnNumOfPosts.setOnClickListener { filterRecyclerView("POSTS") }
+        }
     }
 
     private fun filterRecyclerView(filter: String) {
