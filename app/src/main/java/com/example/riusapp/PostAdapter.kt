@@ -43,11 +43,10 @@ class PostAdapter(private var dataSet: List<List<Any?>>) :
 
             val args = Bundle()
             args.putString("postTitle", post[0].toString())
-            args.putDouble("ratings", post[5] as Double)
+            args.putDouble("ratings", post[5] as  Double)
             args.putString("link", post[2].toString())
-            args.putString("location", "")
+            args.putString("location", post[3].toString())
             args.putString("date", post[4].toString())
-            args.putString("id", post[1].toString())
             postOverviewFragment.arguments = args
 
             val transaction = (itemView.context as AppCompatActivity).supportFragmentManager.beginTransaction()

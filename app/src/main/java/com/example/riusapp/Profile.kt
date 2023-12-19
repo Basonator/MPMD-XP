@@ -56,7 +56,7 @@ class Profile : Fragment() {
     fun logout(){
         app.logout()
         val transaction = (context as AppCompatActivity).supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.frame_layout, Home())
+        transaction.replace(R.id.frame_layout, Profile())
         transaction.addToBackStack(null)
         transaction.commit()
     }
