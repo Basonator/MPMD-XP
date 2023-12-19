@@ -38,5 +38,4 @@ interface ApiService {
 
     @DELETE("comments/{id}")
     suspend fun deleteComment(@Path("id") commentId: String): Response<Void>
-
 }

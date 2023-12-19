@@ -9,9 +9,13 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
+import com.example.riusapp.backend.RetrofitInstance
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
-class CommentAdapter(private var dataSet: List<List<Any?>>) :
+class CommentAdapter(private var dataSet: List<List<Any?>>, private val coroutineScope: CoroutineScope) :
     RecyclerView.Adapter<CommentAdapter.ViewHolder>() {
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -49,6 +53,19 @@ class CommentAdapter(private var dataSet: List<List<Any?>>) :
         private fun deleteComment() {
             val position = adapterPosition
             if (position != RecyclerView.NO_POSITION) {
+
+                coroutineScope.launch {
+                    try {
+                        val response = RetrofitInstance.api.deleteComment(dataSet[position][0].toString() ?: "")
+                        if (!response.isSuccessful) {
+                            Log.e("CommentAdapter", "Error removeing comment: ${response.message()}")
+                        }
+                    } catch (e: Exception) {
+                        Log.e("CommentAdapter", "Exception: ${e.message}")
+                    }
+                }
+
+
                 val removedComment = dataSet[position]
                 dataSet = dataSet.toMutableList().apply { removeAt(position) }
                 notifyItemRemoved(position)
