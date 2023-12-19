@@ -38,8 +38,9 @@ class UserAdapter(private var dataSet: List<List<Any?>>) :
             val args = Bundle()
             args.putString("username", user[0].toString())
             args.putInt("reports", user[1] as Int)
-            args.putInt("ratings", user[2] as Int)
+            args.putDouble("ratings", user[2] as Double)
             args.putInt("posts", user[3] as Int)
+            args.putString("id", user[4] as String)
             userViewFragment.arguments = args
 
             val transaction = (itemView.context as AppCompatActivity).supportFragmentManager.beginTransaction()

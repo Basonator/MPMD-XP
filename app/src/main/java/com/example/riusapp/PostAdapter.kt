@@ -43,7 +43,7 @@ class PostAdapter(private var dataSet: List<List<Any?>>) :
 
             val args = Bundle()
             args.putString("postTitle", post[0].toString())
-            args.putInt("ratings", post[1] as Int)
+            args.putInt("ratings", post[5] as Int)
             args.putString("link", post[2].toString())
             args.putString("location", post[3].toString())
             args.putString("date", post[4].toString())
@@ -66,8 +66,8 @@ class PostAdapter(private var dataSet: List<List<Any?>>) :
             val post = dataSet[position]
             if (post.size >= 5) { // Assuming the video link is at index 2
                 viewHolder.postTitleTextView.text = post[0].toString()
-                viewHolder.scoreTextView.text = post[1].toString()
-                viewHolder.cityTextView.text = post[3].toString()
+                viewHolder.scoreTextView.text = post[5].toString()
+//                viewHolder.cityTextView.text = post[3].toString()
                 viewHolder.dateTextView.text = post[4].toString()
 
                 // Set up VideoView with MediaController
