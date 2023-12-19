@@ -66,9 +66,7 @@ class PostOverview : Fragment() {
         locationTextView = view.findViewById(R.id.cityTextView)
         dateTextView = view.findViewById(R.id.dateTextView)
         val mediaController = MediaController(view.context)
-        mediaController.setAnchorView(linkVideoView)
-        mediaController.setMediaPlayer(linkVideoView)
-        linkVideoView.setMediaController(mediaController)
+
 
 
 
@@ -76,6 +74,10 @@ class PostOverview : Fragment() {
         ratingsTextView.text = ratings.toString()
         linkVideoView.setVideoURI(Uri.parse(link))
         linkVideoView.start()
+        linkVideoView.setOnCompletionListener {
+            linkVideoView.start()
+        }
+        //linkVideoView
         locationTextView.text = location
         dateTextView.text = date
         btnRemove = view.findViewById(R.id.btnRemove)
