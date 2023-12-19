@@ -6,11 +6,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.MediaController
 import android.widget.TextView
 import android.widget.VideoView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
-import android.widget.MediaController
 
 class PostAdapter(private var dataSet: List<List<Any?>>) :
     RecyclerView.Adapter<PostAdapter.ViewHolder>() {
@@ -39,7 +39,7 @@ class PostAdapter(private var dataSet: List<List<Any?>>) :
         }
 
         private fun navigateToPostView(post: List<Any?>) {
-            val userViewFragment = UserView() // TODO: Change this to PostView once you create it
+            val postOverviewFragment = PostOverview() // TODO: Change this to PostView once you create it
 
             val args = Bundle()
             args.putString("postTitle", post[0].toString())
@@ -47,10 +47,10 @@ class PostAdapter(private var dataSet: List<List<Any?>>) :
             args.putString("link", post[2].toString())
             args.putString("location", post[3].toString())
             args.putString("date", post[4].toString())
-            userViewFragment.arguments = args
+            postOverviewFragment.arguments = args
 
             val transaction = (itemView.context as AppCompatActivity).supportFragmentManager.beginTransaction()
-            transaction.replace(R.id.frame_layout, userViewFragment) // TODO: Change this to PostView once you create it
+            transaction.replace(R.id.frame_layout, postOverviewFragment) // TODO: Change this to PostView once you create it
             transaction.addToBackStack(null)
             transaction.commit()
         }
