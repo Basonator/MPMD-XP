@@ -10,7 +10,7 @@ import retrofit2.http.Path
 
 interface ApiService {
     //  users
-    @GET("users")
+    @GET("users/leaderboard")
     suspend fun getUsers(): Response<List<Users>>
 
     @GET("users/verify/{id}")
