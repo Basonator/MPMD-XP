@@ -1,15 +1,21 @@
 package com.example.riusapp.backend
 
 import com.example.riusapp.backend.models.Comments
+import com.example.riusapp.backend.models.LoginRequest
 import com.example.riusapp.backend.models.Posts
 import com.example.riusapp.backend.models.Users
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface ApiService {
     //  users
+    @POST("users/loginAdmin")
+    suspend fun login(@Body loginRequest: LoginRequest): Response<Users>
+
     @GET("users/leaderboard")
     suspend fun getUsers(): Response<List<Users>>
 

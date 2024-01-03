@@ -13,3 +13,8 @@ data class Users (
     val verified: Boolean,
     val banned: Boolean,
 )
+
+data class LoginRequest(
+    val username: String,
+    val password: String
+)
