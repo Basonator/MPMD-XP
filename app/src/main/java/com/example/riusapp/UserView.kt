@@ -15,11 +15,14 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.example.riusapp.backend.RetrofitInstance
 import com.example.riusapp.backend.models.Posts
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class UserView : Fragment() {
     private var username: String? = null
-    private var reports: Int? = null
     private var ratings: Int? = null
+    private var reports: Int? = null
     private var posts: Int? = null
     private var id: String? = null
     private var dataset: List<List<Any>> = emptyList()
@@ -39,9 +42,14 @@ class UserView : Fragment() {
         }
     }
 
+
+    fun formatDate(inputDate: Date): String {
+        val desiredFormat = SimpleDateFormat("d/M/Y", Locale.getDefault())
+        return desiredFormat.format(inputDate)
+    }
     private fun convertPostsToDataset(posts: List<Posts>): List<List<Any>> {
         return posts.map { post ->
-            listOf(post.name, post._id, post.link, post.location, post.date, post.rating)
+            listOf(post.name, post._id, post.link, "", formatDate(post.date), post.rating)
         }
     }
 
